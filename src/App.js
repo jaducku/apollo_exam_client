@@ -1,23 +1,54 @@
 import logo from './logo.svg';
 import './App.css';
+import React, { useState } from 'react';
+import Roles from './components/roles'
+import Teams from './components/teams'
+import People from './components/people'
+
+import { ApolloProvider } from '@apollo/client';
+import { ApolloClient, InMemoryCache } from '@apollo/client'
+
+const client = new ApolloClient({
+  uri: 'https://apollo-exam-mvmim.run.goorm.io/',
+  cache: new InMemoryCache()
+});
 
 function App() {
+
+  const [menu, setMenu] = useState('Roles')
+
+  let mainComp = {
+    Roles: (<Roles />),
+    Teams: (<Teams />),
+    People: (<People />),
+  }
+
+  function NavMenus() {
+    return [
+      'Roles', 'Teams', 'People'
+    ].map((_menu, key) => {
+      return (
+        <li key={key} className={menu === _menu ? 'on' : ''}
+          onClick={() => { setMenu(_menu); }}>{_menu}</li>
+      );
+    });
+  }
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <ApolloProvider client={client}>
+        <header className="App-header">
+          <h1>Company Management</h1>
+          <nav>
+            <ul>
+              {NavMenus()}
+            </ul>
+          </nav>
+        </header>
+        <main>
+          {mainComp[menu]}
+        </main>
+      </ApolloProvider>
     </div>
   );
 }
